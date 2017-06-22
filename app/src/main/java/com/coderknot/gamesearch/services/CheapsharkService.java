@@ -63,7 +63,14 @@ public class CheapsharkService {
                     String storeId = gameJSON.getString("storeID");
                     String normalPrice = gameJSON.getString("normalPrice");
                     String salePrice = gameJSON.getString("salePrice");
-                    String thumbnailURL = gameJSON.getString("thumb");
+                    String thumbnailURL;
+
+                    if(gameJSON.has("thumb")) {
+                        thumbnailURL = gameJSON.getString("thumb");
+                    } else {
+                        thumbnailURL = "";
+                    }
+
 
                     Game game = new Game(gameId, title, releaseDate, storeId, normalPrice, salePrice, thumbnailURL);
                     gamesList.add(game);
