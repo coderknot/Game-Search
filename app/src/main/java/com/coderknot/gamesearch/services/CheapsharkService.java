@@ -3,11 +3,14 @@ package com.coderknot.gamesearch.services;
 import android.util.Log;
 
 import com.coderknot.gamesearch.Constants;
+import com.coderknot.gamesearch.models.Game;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -41,18 +44,37 @@ public class CheapsharkService {
         call.enqueue(callback);
     }
 
-    public void processGames(Response response) {
+    public ArrayList<Game> processGames(Response response) {
         Log.v(TAG, "in processGames");
+        ArrayList<Game> gamesList = new ArrayList<>();
+
         try {
             if(response.isSuccessful()) {
                 String jsonData = response.body().string();
                 JSONArray gamesJSON = new JSONArray(jsonData);
                 Log.v(TAG, String.valueOf(gamesJSON.length()));
+
+                for(int i = 0; i < gamesJSON.length(); i++) {
+                    JSONObject gameJSON = gamesJSON.getJSONObject(i);
+
+                    String gameId = gameJSON.getString("gameID");
+                    String title = gameJSON.getString("title");
+                    String releaseDate = gameJSON.getString("releaseDate");
+                    String storeId = gameJSON.getString("storeID");
+                    String normalPrice = gameJSON.getString("normalPrice");
+                    String salePrice = gameJSON.getString("salePrice");
+                    String thumbnailURL = gameJSON.getString("thumb");
+
+                    Game game = new Game(gameId, title, releaseDate, storeId, normalPrice, salePrice, thumbnailURL);
+                    gamesList.add(game);
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();
         } catch (JSONException e) {
             e.printStackTrace();
         }
+
+        return gamesList;
     }
 }
