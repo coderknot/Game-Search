@@ -24,14 +24,17 @@ public class CheapsharkService {
 
     public static final String SORTBY_VALUE = "Title";
     public static final String DESC_VALUE = "0";
+    public static final String PAGE_SIZE = "60";
 
-    public static void findGames(String title, Callback callback) {
+    public static void findGames(String title, int page, Callback callback) {
         OkHttpClient client = new OkHttpClient.Builder().build();
 
         HttpUrl.Builder urlBuilder = HttpUrl.parse(Constants.CHEAPSHARK_BASE_URL + Constants.CHEAPSHARK_RESOURCE_DEALS).newBuilder();
         urlBuilder.addQueryParameter(Constants.CHEAPSHARK_TITLE_PARAMETER, title);
         urlBuilder.addQueryParameter(Constants.CHEAPSHARK_SORTBY_PARAMETER, SORTBY_VALUE);
         urlBuilder.addQueryParameter(Constants.CHEAPSHARK_DESC_PARAMETER, DESC_VALUE);
+        urlBuilder.addQueryParameter(Constants.CHEAPSHARK_PAGE_SIZE_PARAMETER, PAGE_SIZE);
+        urlBuilder.addQueryParameter(Constants.CHEAPSHARK_PAGE_NUMBER_PARAMETER, Integer.toString(page));
         String url = urlBuilder.build().toString();
 
         Log.v(TAG, url);
