@@ -1,5 +1,6 @@
 package com.coderknot.gamesearch.adapters;
 
+import android.app.FragmentManager;
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -8,7 +9,9 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.coderknot.gamesearch.GamesListActivity;
 import com.coderknot.gamesearch.R;
+import com.coderknot.gamesearch.fragments.AddGameDialogFragment;
 import com.coderknot.gamesearch.models.Game;
 import com.squareup.picasso.Picasso;
 
@@ -42,21 +45,33 @@ public class GamesListAdapter extends RecyclerView.Adapter<GamesListAdapter.Game
         return gamesList.size();
     }
 
-    public class GameViewHolder extends RecyclerView.ViewHolder {
+    public class GameViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         @Bind(R.id.gameTitleTextView) TextView gameTitleTextView;
         @Bind(R.id.gameThumbImageView) ImageView gameThumbImageView;
+        @Bind(R.id.gameAddIconImageView) ImageView gameAddIconImageView;
 
         public GameViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
             context = itemView.getContext();
+
+            gameAddIconImageView.setOnClickListener(this);
         }
 
         public void bindGame(Game game) {
             gameTitleTextView.setText(game.getTitle());
 
-            if(game.getThumbnailURL() != "") {
+            if(!(game.getThumbnailURL().equals(""))) {
                 Picasso.with(context).load(game.getThumbnailURL()).into(gameThumbImageView);
+            }
+        }
+
+        @Override
+        public void onClick(View v) {
+            if(v == gameAddIconImageView) {
+                FragmentManager fragmentManager = ((GamesListActivity) context).getFragmentManager();
+                AddGameDialogFragment addGameDialogFragment = new AddGameDialogFragment();
+                addGameDialogFragment.show(fragmentManager, "Add Game Fragment");
             }
         }
     }
