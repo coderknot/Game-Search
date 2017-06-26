@@ -9,5 +9,6 @@ public class Constants {
     public static final String CHEAPSHARK_TITLE_PARAMETER = "title";
     public static final String CHEAPSHARK_SORTBY_PARAMETER = "sortBy";
     public static final String CHEAPSHARK_DESC_PARAMETER = "desc";
-
+    public static final String CHEAPSHARK_PAGE_SIZE_PARAMETER = "pageSize";
+    public static final String CHEAPSHARK_PAGE_NUMBER_PARAMETER = "pageNumber";
 }
