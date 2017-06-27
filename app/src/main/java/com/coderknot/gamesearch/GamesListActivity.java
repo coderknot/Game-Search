@@ -7,6 +7,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 
+import com.coderknot.gamesearch.adapters.EndlessRecyclerViewScrollListener;
 import com.coderknot.gamesearch.adapters.GamesListAdapter;
 import com.coderknot.gamesearch.models.Game;
 import com.coderknot.gamesearch.services.CheapsharkService;
@@ -22,8 +23,13 @@ import okhttp3.Response;
 
 public class GamesListActivity extends AppCompatActivity {
     private static final String TAG = GamesListActivity.class.getSimpleName();
+
     private GamesListAdapter gamesListAdapter;
     private ArrayList<Game> gamesList = new ArrayList<>();
+    private EndlessRecyclerViewScrollListener scrollListener;
+    private LinearLayoutManager linearLayoutManager;
+
+    public CheapsharkService cheapsharkService;
 
     @Bind(R.id.gameRecyclerView) RecyclerView gameRecyclerView;
 
@@ -34,16 +40,47 @@ public class GamesListActivity extends AppCompatActivity {
         ButterKnife.bind(this);
 
         Intent gameSearchIntent = getIntent();
-        String game = gameSearchIntent.getStringExtra("game");
+        final String game = gameSearchIntent.getStringExtra("game");
 
-        Log.v(TAG, game);
+        cheapsharkService = new CheapsharkService();
+
+        linearLayoutManager = new LinearLayoutManager(this);
+        gameRecyclerView.setLayoutManager(linearLayoutManager);
+        gamesListAdapter = new GamesListAdapter();
+        scrollListener = new EndlessRecyclerViewScrollListener(linearLayoutManager) {
+            @Override
+            public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
+                loadNextDataFromApi(game, page);
+            }
+        };
+        gameRecyclerView.addOnScrollListener(scrollListener);
+
         getGamesList(game);
     }
 
-    private void getGamesList(String game) {
-        final CheapsharkService cheapsharkService = new CheapsharkService();
+    public void loadNextDataFromApi(String game, int page) {
+        cheapsharkService.findGames(game, page, new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                e.printStackTrace();
+            }
 
-        cheapsharkService.findGames(game, new Callback() {
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                gamesList.addAll(cheapsharkService.processGames(response));
+
+                GamesListActivity.this.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        gamesListAdapter.updateGamesList(gamesList);
+                    }
+                });
+            }
+        });
+    }
+
+    private void getGamesList(String game) {
+        cheapsharkService.findGames(game, 0, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
                 e.printStackTrace();
@@ -52,7 +89,7 @@ public class GamesListActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 Log.v(TAG, response.toString());
-                gamesList = cheapsharkService.processGames(response);
+                gamesList.addAll(cheapsharkService.processGames(response));
 
                 GamesListActivity.this.runOnUiThread(new Runnable() {
 
@@ -60,9 +97,6 @@ public class GamesListActivity extends AppCompatActivity {
                     public void run() {
                         gamesListAdapter = new GamesListAdapter(getApplicationContext(), gamesList);
                         gameRecyclerView.setAdapter(gamesListAdapter);
-                        RecyclerView.LayoutManager layoutManager =
-                                new LinearLayoutManager(GamesListActivity.this);
-                        gameRecyclerView.setLayoutManager(layoutManager);
                         gameRecyclerView.setHasFixedSize(true);
                     }
                 });
