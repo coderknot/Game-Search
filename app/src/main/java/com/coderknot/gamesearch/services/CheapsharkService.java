@@ -1,7 +1,5 @@
 package com.coderknot.gamesearch.services;
 
-import android.util.Log;
-
 import com.coderknot.gamesearch.Constants;
 import com.coderknot.gamesearch.models.Game;
 
@@ -37,8 +35,6 @@ public class CheapsharkService {
         urlBuilder.addQueryParameter(Constants.CHEAPSHARK_PAGE_NUMBER_PARAMETER, Integer.toString(page));
         String url = urlBuilder.build().toString();
 
-        Log.v(TAG, url);
-
         Request request = new Request.Builder()
                 .url(url)
                 .build();
@@ -48,14 +44,12 @@ public class CheapsharkService {
     }
 
     public ArrayList<Game> processGames(Response response) {
-        Log.v(TAG, "in processGames");
         ArrayList<Game> gamesList = new ArrayList<>();
 
         try {
             if(response.isSuccessful()) {
                 String jsonData = response.body().string();
                 JSONArray gamesJSON = new JSONArray(jsonData);
-                Log.v(TAG, String.valueOf(gamesJSON.length()));
 
                 for(int i = 0; i < gamesJSON.length(); i++) {
                     JSONObject gameJSON = gamesJSON.getJSONObject(i);
