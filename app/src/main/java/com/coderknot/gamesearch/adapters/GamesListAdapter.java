@@ -24,6 +24,8 @@ public class GamesListAdapter extends RecyclerView.Adapter<GamesListAdapter.Game
     private ArrayList<Game> gamesList = new ArrayList<>();
     private Context context;
 
+    public GamesListAdapter() { }
+
     public GamesListAdapter(Context context, ArrayList<Game> gamesList) {
         this.context = context;
         this.gamesList = gamesList;
@@ -43,6 +45,11 @@ public class GamesListAdapter extends RecyclerView.Adapter<GamesListAdapter.Game
     @Override
     public int getItemCount() {
         return gamesList.size();
+    }
+
+    public void updateGamesList(ArrayList<Game> gamesList) {
+        this.gamesList = gamesList;
+        notifyDataSetChanged();
     }
 
     public class GameViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
